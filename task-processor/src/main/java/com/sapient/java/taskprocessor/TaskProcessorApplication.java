@@ -30,9 +30,7 @@ public class TaskProcessorApplication {
 		ConfigReader configReader = new ConfigReader();
 		String path = null;
 		if(args.length > 0 && !Objects.isNull(args[0])) {
-			
 			path = args[0];
-			 path = "C:\\Users\\kuspalsi\\Documents\\workspace-sts-3.9.9.RELEASE\\task-processing-engine\\task-processor\\src\\main\\resources\\samplefile.csv";
 		}
 		List<Config> configs = configReader.buildConfigFromCsv(path);
 		logger.info("Config is {}", configs);
