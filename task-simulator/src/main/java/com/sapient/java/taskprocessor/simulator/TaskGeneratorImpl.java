@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +38,8 @@ public class TaskGeneratorImpl implements TaskGenerator {
 		distributedCountMap.entrySet().stream().forEach(taskDistributionEntry -> {
 			/* random priority for task types */
 			String taskType = taskDistributionEntry.getKey();
-			IntStream.range(0, taskDistributionEntry.getValue()).peek(i->{
+			Integer distributedCount = taskDistributionEntry.getValue();
+			for (int i = 0; i < distributedCount; i++) {
 				int ramdomPriority = ThreadLocalRandom.current().nextInt(1, 10);
 				Task task = new Task();
 				task.setGroupId(batchNo + "");
@@ -51,7 +51,7 @@ public class TaskGeneratorImpl implements TaskGenerator {
 				task.setTaskDuration(
 						ThreadLocalRandom.current().nextInt(config.getMinRuntime(), config.getMaxRunTime()));
 				tasks.add(task);
-			});
+			}
 
 		});
 
