@@ -34,7 +34,7 @@ public class TaskGeneratorImpl implements TaskGenerator {
 		config.getTypeDistribution().entrySet().stream().forEach(taskDistribution -> {
 			Integer distributionPercent = taskDistribution.getValue();
 			distributedCountMap.put(taskDistribution.getKey(),
-					Math.floorDiv(randomTaskCount * distributionPercent, 100));
+					Math.round((randomTaskCount * distributionPercent)/100));
 		});
 
 		/* after calculating task count for different task type */
