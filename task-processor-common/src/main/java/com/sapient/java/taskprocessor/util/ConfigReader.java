@@ -2,13 +2,17 @@ package com.sapient.java.taskprocessor.util;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -32,7 +36,13 @@ public class ConfigReader {
 		List<Config> configForbatches = new ArrayList<Config>();
 		File file = null;
 		if (Objects.isNull(path)) {
-			file = new File(this.getClass().getResource("/samplefile.csv").getFile());
+			InputStreamReader isr = new InputStreamReader(getClass().getResourceAsStream("/samplefile.csv"));
+			file = new File("temp.csv");
+			OutputStream outputStream = new FileOutputStream(file);
+			IOUtils.copy(isr, outputStream);
+//			file = new File(this.getClass().getResource("/samplefile.csv").getFile());
+//			ClassPathResource cl = new ClassPathResource("samplefile.csv");
+			// file = cl.getFile();
 		} else {
 			file = new File(path);
 		}
@@ -62,6 +72,13 @@ public class ConfigReader {
 		} catch (Exception e) {
 			logger.error("Config loading failed {}, {}", e.getMessage(), e.getCause());
 			throw new Exception("Loading config failed from input file.");
+		} finally {
+			if (file.exists()) {
+				try {
+					file.delete();
+				} catch (Exception e) {
+				}
+			}
 		}
 
 		return configForbatches;
