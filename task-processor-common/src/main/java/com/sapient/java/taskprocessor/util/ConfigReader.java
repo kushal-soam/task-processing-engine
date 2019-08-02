@@ -35,14 +35,12 @@ public class ConfigReader {
 	public List<Config> buildConfigFromCsv(String path) throws Exception {
 		List<Config> configForbatches = new ArrayList<Config>();
 		File file = null;
+		// Below condition is added in case file path is not provided externally, so  just to run with classpath samplefile config.
 		if (Objects.isNull(path)) {
 			InputStreamReader isr = new InputStreamReader(getClass().getResourceAsStream("/samplefile.csv"));
 			file = new File("temp.csv");
 			OutputStream outputStream = new FileOutputStream(file);
 			IOUtils.copy(isr, outputStream);
-//			file = new File(this.getClass().getResource("/samplefile.csv").getFile());
-//			ClassPathResource cl = new ClassPathResource("samplefile.csv");
-			// file = cl.getFile();
 		} else {
 			file = new File(path);
 		}
@@ -73,7 +71,7 @@ public class ConfigReader {
 			logger.error("Config loading failed {}, {}", e.getMessage(), e.getCause());
 			throw new Exception("Loading config failed from input file.");
 		} finally {
-			if (file.exists()) {
+			if (!Objects.isNull(file) && file.exists()) {
 				try {
 					file.delete();
 				} catch (Exception e) {
