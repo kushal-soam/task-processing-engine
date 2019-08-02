@@ -1,8 +1,7 @@
 package com.sapient.java.taskprocessor;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
@@ -25,11 +24,17 @@ import com.sapient.java.taskprocessor.util.ConfigReader;
 public class TaskProcessorApplication {
 	private static final Logger logger = LoggerFactory.getLogger(TaskProcessorApplication.class);
 
-	public static void main(String[] args) throws IOException, URISyntaxException {
+	public static void main(String[] args) throws Exception {
 
 		SpringApplication.run(TaskProcessorApplication.class, args);
 		ConfigReader configReader = new ConfigReader();
-		List<Config> configs = configReader.buildConfigFromCsv();
+		String path = null;
+		if(args.length > 0 && !Objects.isNull(args[0])) {
+			
+			path = args[0];
+			 path = "C:\\Users\\kuspalsi\\Documents\\workspace-sts-3.9.9.RELEASE\\task-processing-engine\\task-processor\\src\\main\\resources\\samplefile.csv";
+		}
+		List<Config> configs = configReader.buildConfigFromCsv(path);
 		logger.info("Config is {}", configs);
 		generateBatchAndSubmit(configs);
 
@@ -47,14 +52,10 @@ public class TaskProcessorApplication {
 				logger.info("Going to sleep for {} seconds", config.getFrequency());
 				TimeUnit.SECONDS.sleep(config.getFrequency());
 			} catch (InterruptedException e) {
-				logger.info("Exception occurred whiling delaying on the basis of frequency {}", config);
+				logger.error("Exception occurred whiling delaying on the basis of frequency {}", config);
 			}
 		});
-		if (taskExecuter.isIdle()) {
-			taskExecuter.shutDown();
-		}
+		taskExecuter.shutDown();
 	}
-
-
 
 }

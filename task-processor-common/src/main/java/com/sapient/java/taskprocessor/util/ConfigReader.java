@@ -1,20 +1,20 @@
 package com.sapient.java.taskprocessor.util;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URISyntaxException;
+import java.io.File;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import com.sapient.java.taskprocessor.model.Config;
-import com.sapient.java.taskprocessor.model.Config.Builder;
+import com.sapient.java.taskprocessor.model.Config.ConfigBuilder;
 
 /**
  * @author kuspalsi
@@ -22,36 +22,50 @@ import com.sapient.java.taskprocessor.model.Config.Builder;
  */
 public class ConfigReader {
 
-	
-	public List<Config> buildConfigFromCsv() throws IOException, FileNotFoundException, URISyntaxException {
+	private static final Logger logger = LoggerFactory.getLogger(ConfigReader.class);
+
+	/**
+	 * @return
+	 * @throws Exception
+	 */
+	public List<Config> buildConfigFromCsv(String path) throws Exception {
 		List<Config> configForbatches = new ArrayList<Config>();
-		InputStream in = this.getClass().getResourceAsStream("/samplefile.csv");
-		BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-		try (CSVParser csvParser = new CSVParser(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());) {
-			for (CSVRecord record : csvParser) {
-				Integer frequency = Integer.parseInt(record.get(0));
-				Integer mintaskCount = Integer.parseInt(record.get(1));
-				Integer maxTaskCount = Integer.parseInt(record.get(2));
-				Integer minTaskRunTime = Integer.parseInt(record.get(3));
-				Integer maxTaskRunTime = Integer.parseInt(record.get(4));
-				String taskDistibution = record.get(5);
-				Builder builder = new Builder();
+		File file = null;
+		if (Objects.isNull(path)) {
+			file = new File(this.getClass().getResource("/samplefile.csv").getFile());
+		} else {
+			file = new File(path);
+		}
+		try (FileReader filereader = new FileReader(file);
+				BufferedReader br = new BufferedReader(filereader);
+				CSVParser csvParser = new CSVParser(br, CSVFormat.DEFAULT.withFirstRecordAsHeader());) {
+
+			csvParser.forEach(record -> {
+
+				Integer frequency = Integer.parseInt(StringUtils.trimWhitespace(record.get(0)));
+				Integer mintaskCount = Integer.parseInt(StringUtils.trimWhitespace(record.get(1)));
+				Integer maxTaskCount = Integer.parseInt(StringUtils.trimWhitespace(record.get(2)));
+				Integer minTaskRunTime = Integer.parseInt(StringUtils.trimWhitespace(record.get(3)));
+				Integer maxTaskRunTime = Integer.parseInt(StringUtils.trimWhitespace(record.get(4)));
+				String taskDistibution = StringUtils.trimWhitespace(record.get(5));
+
+				/* build configuration from input file */
+				ConfigBuilder builder = new ConfigBuilder();
 				builder.addFrequency(frequency);
 				builder.addMaxRunTime(maxTaskRunTime);
-				builder.addMaxSize(maxTaskCount);
+				builder.addMaxBatchSize(maxTaskCount);
 				builder.addMinRunTime(minTaskRunTime);
-				builder.addMinSize(mintaskCount);
+				builder.addMinBatchSize(mintaskCount);
 				builder.addTypeDistribution(taskDistibution);
 				configForbatches.add(builder.build());
-			}
+			});
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Config loading failed {}, {}", e.getMessage(), e.getCause());
+			throw new Exception("Loading config failed from input file.");
 		}
 
-		/* Read proeperty file for different configuration */
 		return configForbatches;
 
 	}
-
 
 }

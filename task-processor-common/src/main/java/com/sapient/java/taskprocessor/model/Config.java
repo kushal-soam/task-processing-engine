@@ -15,10 +15,10 @@ public class Config {
 	private final Integer frequency;
 	
 	/* min size of task in a batch */
-	private final Integer minSize;
+	private final Integer minBatchSize;
 	
 	/* max size of task in a batch */
-	private final Integer maxSize;
+	private final Integer maxBatchSize;
 	
 	/* min runtime of task in a batch */
 	private final Integer minRuntime;
@@ -29,42 +29,42 @@ public class Config {
 	/* distribution of task for batch */
 	private final Map<String, Integer> typeDistribution;
 
-	public static class Builder {
+	public static class ConfigBuilder {
 
 		private Integer frequency;
-		private Integer minSize;
-		private Integer maxSize;
+		private Integer minBatchSize;
+		private Integer maxBatchSize;
 		private Integer minRuntime;
 		private Integer maxRunTime;
 		private Map<String, Integer> typeDistribution;
 
-		public Builder addFrequency(Integer frequency) {
+		public ConfigBuilder addFrequency(Integer frequency) {
 			this.frequency = frequency;
 			return this;
 		}
 
-		public Builder addMinSize(Integer minSize) {
-			this.minSize = minSize;
+		public ConfigBuilder addMinBatchSize(Integer minSize) {
+			this.minBatchSize = minSize;
 			return this;
 		}
 
-		public Builder addMaxSize(Integer maxSize) {
-			this.maxSize = maxSize;
+		public ConfigBuilder addMaxBatchSize(Integer maxSize) {
+			this.maxBatchSize = maxSize;
 			return this;
 		}
 
-		public Builder addMinRunTime(Integer minRuntime) {
+		public ConfigBuilder addMinRunTime(Integer minRuntime) {
 			this.minRuntime = minRuntime;
 			return this;
 		}
 
-		public Builder addMaxRunTime(Integer maxRunTime) {
+		public ConfigBuilder addMaxRunTime(Integer maxRunTime) {
 			this.maxRunTime = maxRunTime;
 			return this;
 		}
 
 		
-		public Builder addTypeDistribution(String typeDistributionData) {
+		public ConfigBuilder addTypeDistribution(String typeDistributionData) {
 			StringTokenizer stringTokenizer = new StringTokenizer(typeDistributionData, "|");
 			Map<String, Integer> taskDistributionMap = new HashMap<String, Integer>();
 			while (stringTokenizer.hasMoreTokens()) {
@@ -84,12 +84,12 @@ public class Config {
 	/**
 	 * @param builder
 	 */
-	private Config(Builder builder) {
+	private Config(ConfigBuilder builder) {
 		this.frequency = builder.frequency;
 		this.maxRunTime = builder.maxRunTime;
-		this.maxSize = builder.maxSize;
+		this.maxBatchSize = builder.maxBatchSize;
 		this.minRuntime = builder.minRuntime;
-		this.minSize = builder.minSize;
+		this.minBatchSize = builder.minBatchSize;
 		this.typeDistribution = builder.typeDistribution;
 	}
 	
@@ -106,7 +106,7 @@ public class Config {
 	 * @return the minSize
 	 */
 	public Integer getMinSize() {
-		return minSize;
+		return minBatchSize;
 	}
 
 
@@ -114,7 +114,7 @@ public class Config {
 	 * @return the maxSize
 	 */
 	public Integer getMaxSize() {
-		return maxSize;
+		return maxBatchSize;
 	}
 
 
@@ -144,7 +144,7 @@ public class Config {
 
 	@Override
 	public String toString() {
-		return "BatchModel [frequency=" + frequency + ", minSize=" + minSize + ", maxSize=" + maxSize + ", minRuntime="
+		return "BatchModel [frequency=" + frequency + ", minBatchSize=" + minBatchSize + ", maxBatchSize=" + maxBatchSize + ", minRuntime="
 				+ minRuntime + ", maxRunTime=" + maxRunTime + ", typeDistribution=" + typeDistribution + "]";
 	}
 

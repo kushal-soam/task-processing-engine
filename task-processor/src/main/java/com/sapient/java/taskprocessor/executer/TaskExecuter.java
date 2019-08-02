@@ -18,6 +18,9 @@ import com.sapient.java.taskprocessor.model.Task;
  */
 public class TaskExecuter {
 	private static final Logger logger = LoggerFactory.getLogger(TaskExecuter.class);
+	public static int corePoolSize = 1;
+	public static int maximumPoolSize = 8;
+	public static long keepAliveTime = 0L;
 
 	private static TaskExecuter taskExecuter = null;
 
@@ -26,8 +29,8 @@ public class TaskExecuter {
 
 	private TaskExecuter() {
 		priorityQueue = new PriorityBlockingQueue<Runnable>();
-		priorityTaskPoolExecutor = new ThreadPoolExecutor(2, 8, 1000, TimeUnit.SECONDS, priorityQueue);
-		// priorityTaskPoolExecutor = Executors.newFixedThreadPool(10);
+		priorityTaskPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime,
+				TimeUnit.SECONDS, priorityQueue);
 	}
 
 	public static TaskExecuter getInstance() {
@@ -39,25 +42,14 @@ public class TaskExecuter {
 
 	public void submitBatch(List<Task> tasks) {
 
-		priorityQueue.addAll(tasks);
 		logger.info("priorityQueue elements are: {}, Size is: {}", priorityQueue, priorityQueue.size());
 
-		tasks.forEach(task-> {
+		tasks.forEach(task -> {
 			priorityTaskPoolExecutor.execute(task);
 		});
-//		while (!priorityQueue.isEmpty()) {
-//			try {
-//				priorityTaskPoolExecutor.submit(priorityQueue.take());
-//			} catch (InterruptedException e) {
-//				// exception needs special handling
-//			}
-//		}
 
 	}
 
-	public boolean isIdle() {
-		return priorityQueue.isEmpty();
-	}
 	public void shutDown() {
 		priorityTaskPoolExecutor.shutdown();
 	}
